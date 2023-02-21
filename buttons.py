@@ -26,6 +26,13 @@ def buttons():
     match_result.penup()
     match_result.goto(0, -300)
 
+    mask_button = turtle.Turtle()
+    mask_button.shape('circle')
+    mask_button.shapesize(1, 1, 1)
+    mask_button.fillcolor('grey')
+    mask_button.penup()
+    mask_button.goto(0, 230)
+
     global roll_button
     roll_button = turtle.Turtle()
     roll_button.shape('circle')
@@ -33,6 +40,7 @@ def buttons():
     roll_button.fillcolor('red')
     roll_button.penup()
     roll_button.goto(0, 230)
+
 
     s.update()
 
