@@ -10,6 +10,8 @@ s.setup(700, 700)
 
 step_size = 20
 players_names = []
+# turtle starting position Y coordinates
+x = [0, -75, 75, -150, 150]
 
 
 dice_results = []
@@ -31,15 +33,25 @@ color_dict = {
     'o': '#fabd2f'
     }
 
+colors_list = ['b', 'B', 'g', 'G', 'p', 'P', 'r', 'R', 'y', 'Y', 'o', 'O']
+
+def turtle_starting_pos(i):
+    s.tracer(0)
+    num[i].clear()
+    num[i].shape("turtle")
+    num[i].shapesize(3, 3, 3)
+    num[i].penup()
+    num[i].goto(-300, x[i])
+    num[i].pendown()
+    s.update()
+    s.tracer(1) 
 
 def players_settings():
     global players_dict
     global num
     global number_of_players
-    global x
     num = []
-    # turtle starting position Y coordinates
-    x = [0, -75, 75, -150, 150]
+
     s.tracer(0)
     
     number_of_players = s.textinput("Number of players", "Enter number of players: 1-5")
@@ -47,7 +59,6 @@ def players_settings():
     while number_of_players not in {'1', '2', '3', '4', '5'}:
         number_of_players = s.textinput("Number of players", "Enter CORRECT NUMBER of players: 1-5")
         if number_of_players in {'1', '2', '3', '4', '5'}:
-            number_of_players = int(number_of_players)
             break
     number_of_players = int(number_of_players)
         
@@ -66,43 +77,31 @@ def players_settings():
 
         color = s.textinput(players_names[i]+", choose color!", "Enter letter:\n\nb - black \ng - green \np - pink"
                                                                     " \nr - red \ny - yellow \no - orange\n")
-        while color not in {'b', 'g', 'p', 'r', 'y', 'o'}:
+        while color not in colors_list:
             color = s.textinput(players_names[i]+", choose color!", "Enter correct letter:\n\nb - black \ng - green"
                                                                         " \np - pink \nr - red \ny - yellow "
                                                                         "\no - orange\n")
-            if color in {'b', 'g', 'p', 'r', 'y', 'o'}:
-                    break                
-        num[i].fillcolor(color_dict[color])
-        num[i].clear()
-        num[i].shape("turtle")
-        num[i].shapesize(3, 3, 3)
-        num[i].penup()
-        num[i].goto(-300, x[i])
-        num[i].pendown()
-        s.update()
-        s.tracer(1)
-        
+            if color in colors_list:
+                break
+
+        num[i].fillcolor(color_dict[color.lower()])        
+        turtle_starting_pos(i)
+   
+
+       
 
 def rematch_settings():
     dice_image.res_reset()
-    buttons.match_result.clear()
-    s.tracer(0)
+    buttons.match_result.clear()  
     
     for i in range(number_of_players):
-        
-        num[i].clear()
-        num[i].shape("turtle")
-        num[i].shapesize(3, 3, 3)
-        num[i].penup()
-        num[i].goto(-300, x[i])
-        num[i].pendown()
-        
-    s.update()
-    s.tracer(1)    
+        turtle_starting_pos(i)
+            
 
 def dice_result(_, __):
 
     dice_image.res_reset()
+    buttons.roll_button.hideturtle()
     
     result = str(random.choice([1, 2, 3, 4, 5, 6]))
     dice_dict[result]()
@@ -110,33 +109,41 @@ def dice_result(_, __):
     s.listen()
     dice_results.append(result)
 
-    a = len(dice_results) % number_of_players
-    if a == 0:
-        a = number_of_players
 
-    num[a-1].fd(int(result)*step_size)
+    player_turn = len(dice_results) % number_of_players
+    if player_turn == 0:
+        player_turn = number_of_players
+
+    num[player_turn-1].fd(int(result)*step_size)
+
+    buttons.roll_button.showturtle()
+
+    
 
     for i in range(number_of_players):
         if num[i].xcor() >= 250:
             buttons.match_result.write(str(players_names[i])+' wins!', font=("Verdana", 20, "normal"), align='center')
             replay()
+
         
 
 def replay():
     replay = s.textinput("Play again?", "Type 'Y' to play again, type 'N' to exit")
 
     if replay:
-        if replay in {'y', 'Y'}:
+        replay = replay.capitalize()
+        if replay == 'Y':
             rematch_settings()
                     
-        elif replay.capitalize() == 'N':
+        elif replay == 'N':
             s.bye()
         else:
-            while replay not in {'Y', 'y', 'N', 'n'}:
+            while replay not in {'Y', 'N'}:
                 replay = s.textinput("I don't understand...", "Type 'Y' to play again, type 'N' to exit")
-                if replay.capitalize() == 'Y':
+                replay = replay.capitalize()
+                if replay == 'Y':
                     rematch_settings()
-                elif replay.capitalize() == 'N':
+                elif replay == 'N':
                     s.bye()
     elif replay == '':
         rematch_settings()
